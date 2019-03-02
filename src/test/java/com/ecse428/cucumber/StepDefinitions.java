@@ -52,6 +52,64 @@ public class StepDefinitions {
         System.out.println("Clicking Compose button");
     }    
 
+    @And("^I specify a valid email address$")
+    public void iSpecifyValidEmail() throws Throwable{
+        System.out.println("Attempting to find recipient textbox...");
+        Webelement recipient = driver.findElement(By.id(":18x"));
+        System.out.println("Found!");
+        recipient.clear();
+        String email = ""; //TODO: Need to take random email from bank of valid emails
+        recipient.sendKeys(email);
+    }
+
+    @And("^I click on the Attach File button$")
+    public void iClickAttachFile() throws Throwable{
+        System.out.println("Attempting to find Attach File button...");
+        WebElement btn = (new WebDriverWait(driver, 10))
+            .until(ExpectedConditions.elementToBeClickable(By.id(":19x")));
+        System.out.println("Found!");
+        btn.click();
+        System.out.println("Clicking Attach File button");
+    }
+
+    @And("^I select the desired image")
+    public void iSelectValidImage() throws Throwable{
+
+
+    }
+
+    @And("^I click the Send button")
+    public void iClickSend() throws Throwable{
+        System.out.println("Attempting to find Send button...");
+        WebElement btn = (new WebDriverWait(driver, 10))
+            .until(ExpectedConditions.elementToBeClickable(By.id(":185")));
+        System.out.println("Found!");
+        btn.click();
+        System.out.println("Clicking Send button");
+    }
+
+
+    @And("^I click on the Insert Photo button")
+    public void iClickInsertPhoto() throws Throwable{
+        System.out.println("Attempting to find Insert Photo button...");
+        WebElement btn = (new WebDriverWait(driver, 10))
+            .until(ExpectedConditions.elementToBeClickable(By.id(":1a5")));
+        System.out.println("Found!");
+        btn.click();
+        System.out.println("Clicking Insert Photo button");
+    }
+
+    @And("^I click the As Attachment button")
+    public void iClickAsAttachment() throws Throwable{
+        System.out.println("Attempting to find As Attachment button...");
+        WebElement btn = (new WebDriverWait(driver, 10))
+            .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(text(),'As Attachment')]")));
+        System.out.println("Found!");
+        btn.click();
+        System.out.println("Clicking As Attachment button");
+    }
+
+
     private void setupSeleniumWebDrivers() throws MalformedURLException {
         if (driver == null) {
             System.out.println("Setting up Selenium ChromeDriver...");
