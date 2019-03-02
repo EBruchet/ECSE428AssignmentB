@@ -2,7 +2,8 @@ Feature: Send an email with an attached images
 
 
   Background:
-    Given I am logged in on a Gmail page
+    Given I am on a Gmail page
+    And I am logged in
 
 
   Scenario Outline: I try to send an email to a valid email address with an attached image

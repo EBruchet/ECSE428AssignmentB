@@ -42,7 +42,15 @@ public class StepDefinitions {
         System.out.println("Found!");
     }
 
-    
+    @When("^I click on the Compose button")
+    public void iClickComposeButton() throws Throwable{
+        System.out.println("Checking to see if logged in by attempting to find Compose button...");
+        WebElement btn = (new WebDriverWait(driver, 10))
+            .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(text(),'Compose')]")));
+        System.out.println("Found!");
+        btn.click();
+        System.out.println("Clicking Compose button");
+    }    
 
     private void setupSeleniumWebDrivers() throws MalformedURLException {
         if (driver == null) {
