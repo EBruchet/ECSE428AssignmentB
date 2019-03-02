@@ -55,7 +55,7 @@ public class StepDefinitions {
     @And("^I specify a valid email address$")
     public void iSpecifyValidEmail() throws Throwable{
         System.out.println("Attempting to find recipient textbox...");
-        Webelement recipient = driver.findElement(By.id(":18x"));
+        WebElement recipient = driver.findElement(By.id(":18x"));
         System.out.println("Found!");
         recipient.clear();
         String email = ""; //TODO: Need to take random email from bank of valid emails
@@ -109,6 +109,15 @@ public class StepDefinitions {
         System.out.println("Clicking As Attachment button");
     }
 
+    @And("^I specify an invalid email address")
+    public void iSpecifyInvalidEmail() throws Throwable{
+        System.out.println("Attempting to find recipient textbox...");
+        WebElement recipient = driver.findElement(By.id(":18x"));
+        System.out.println("Found!");
+        recipient.clear();
+        String email = ""; //TODO: Need to take random email from bank of invalid emails
+        recipient.sendKeys(email);
+    }
 
     private void setupSeleniumWebDrivers() throws MalformedURLException {
         if (driver == null) {
