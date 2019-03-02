@@ -18,8 +18,10 @@ import java.net.MalformedURLException;
 public class StepDefinitions {
 
     private WebDriver driver;
-    private final String PATH_TO_CHROME_DRIVER = "D:/UbuntuShared/chromedriver";
+    private final String PATH_TO_CHROME_DRIVER = "D:/UbuntuShared/chromedriver/chromedriver.exe";
     private final String EMAIL_URL = "https://mail.google.com/mail/u/0/#inbox";
+    private final String EMAIL_ADDRESS = "dreamteamlite@gmail.com";
+    private final String EMAIL_PASSWORD = "Spaget1!";
 //    private final String EMAIL_SUBJECT = "Monoprice 115365 Monoprice Select Mini 3D Printer";
 //    private final String DELETE_BTN_NAME = "submit.delete.C3NLW69582M4B4";
 //    private final String CART_URL = "https://www.amazon.ca/gp/cart/view.html/ref=nav_cart";
@@ -55,7 +57,7 @@ public class StepDefinitions {
     @And("^I specify a valid email address$")
     public void iSpecifyValidEmail() throws Throwable{
         System.out.println("Attempting to find recipient textbox...");
-        Webelement recipient = driver.findElement(By.id(":18x"));
+        WebElement recipient = driver.findElement(By.id(":18x"));
         System.out.println("Found!");
         recipient.clear();
         String email = ""; //TODO: Need to take random email from bank of valid emails
