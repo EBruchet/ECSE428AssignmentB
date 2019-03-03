@@ -6,15 +6,17 @@ Feature: Send an email with an attached images
     And I am logged in
 
 
-  Scenario: I try to send an email to a valid email address with an attached image
+  Scenario Outline: I try to send an email to a valid email address with an attached image
     When I click on the Compose button
-    And I specify a valid email address
+    And I specify a valid email address as "<email>"
     And I click on the Attach File button
-    And I select the desired image
+    And I select the desired image as "<path>"
     And I click the Send button
 #    Then I
-#    Examples:
-#      |  |
+    Examples:
+      | email   | path |
+      | dreamteamlite@gmail.com | C:\Users\Evan\Downloads\Spicy.PNG |
+      | dreamteamlite@gmail.com | C:\Users\Evan\Downloads\Ran.jpg |
 
 #  Scenario: I try to send an email to a valid email address with an attached image greater than 25 MB
 #    When I click on the Compose button

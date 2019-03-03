@@ -65,8 +65,8 @@ public class StepDefinitions {
         System.out.println("Clicking Compose button");
     }    
 
-    @And("^I specify a valid email address$")
-    public void iSpecifyValidEmail() throws Throwable{
+    @And("^I specify a valid email address as \"([^\"]*)\"$")
+    public void iSpecifyValidEmail(String arg1) throws Throwable{
         System.out.println("Attempting to find recipient textbox...");
         WebElement recipient = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.elementToBeClickable(By.name(RECIPIENT_TEXT_BOX)));
@@ -77,7 +77,7 @@ public class StepDefinitions {
         subject.clear();
         String subjectString = "Subject";
         String email = "dreamteamlite@gmail.com"; //TODO: Need to take random email from bank of valid emails
-        recipient.sendKeys(email);
+        recipient.sendKeys(arg1);
         subject.sendKeys(subjectString);
     }
 
@@ -93,16 +93,16 @@ public class StepDefinitions {
         System.out.println("Clicking Attach File button\n");
     }
 
-    @And("^I select the desired image")
-    public void iSelectValidImage() throws Throwable{
+    @And("^I select the desired image as \"([^\"]*)\"$")
+    public void iSelectValidImage(String arg1) throws Throwable{
         System.out.println("Attempting to type file path...");
-        type("C:\\Users\\Evan\\Downloads\\Spicy.PNG");
+        type(arg1);
 
 
         Robot robot = new Robot();
         robot.keyPress(KeyEvent.VK_ENTER);
         robot.keyRelease(KeyEvent.VK_ENTER);
-        System.out.print("Done!\n");
+        System.out.println("Done!");
         waitRobot = true;
     }
 
@@ -112,13 +112,14 @@ public class StepDefinitions {
             System.out.println("wtf");
         }
         Thread.sleep(5000);
-        System.out.println("Attempting to find Send button...");
+        System.out.print("Attempting to find Send button...");
         WebElement btn = (new WebDriverWait(driver, 10))
             .until(ExpectedConditions.elementToBeClickable(By.xpath(SEND_BTN)));
         System.out.println("Found!\n");
         btn.click();
         System.out.println("Clicking Send button");
-//        driver.quit();
+        Thread.sleep(3000);
+        driver.quit();
     }
 
     @And("^I click on the Insert Photo button")
