@@ -4,19 +4,18 @@ import cucumber.annotation.en.And;
 import cucumber.annotation.en.Given;
 import cucumber.annotation.en.Then;
 import cucumber.annotation.en.When;
-import net.bytebuddy.implementation.bytecode.Throw;
-import org.junit.Assert;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.awt.*;
+import java.util.List;
 import java.awt.event.KeyEvent;
 import java.net.MalformedURLException;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static java.awt.event.KeyEvent.*;
 
@@ -70,8 +69,8 @@ public class StepDefinitions {
      * E-MAIL / SUBJECT SPECIFICATION
      * */
 
-    @And("^I specify a valid email address as \"([^\"]*)\"$")
-    public void iSpecifyValidEmail(String validEmail) throws Throwable{
+    @And("^I specify a valid email address as \"([^\"]*)\" with subject \"([^\"]*)\"$")
+    public void iSpecifyValidEmail(String validEmail, String subjectString) throws Throwable{
         System.out.println("Attempting to find recipient textbox...");
         WebElement recipient = driverWait
                 .until(ExpectedConditions.elementToBeClickable(By.name(RECIPIENT_TEXT_BOX)));
@@ -81,7 +80,7 @@ public class StepDefinitions {
         recipient.clear();
         subject.clear();
         recipient.sendKeys(validEmail);
-        subject.sendKeys(SENT_EMAIL_SUBJECT);
+        subject.sendKeys(subjectString);
     }
 
     @And("^I specify an invalid email address as \"([^\"]*)\"$")
@@ -128,17 +127,18 @@ public class StepDefinitions {
 
     @And("^I click the As Attachment button")
     public void iClickAsAttachment() throws Throwable{
-        String parentWindowHandler = driver.getWindowHandle(); // Store your parent window
-        String subWindowHandler = null;
-
-        Set<String> handles = driver.getWindowHandles(); // get all window handles
-        Iterator<String> iterator = handles.iterator();
-        while (iterator.hasNext()){
-            subWindowHandler = iterator.next();
-        }
-        driver.switchTo().window(subWindowHandler);
         System.out.println("Attempting to find As Attachment button...");
-        String AS_ATTACHMENT_BTN = "//div[contains(@value,'attach')]";
+        String AS_ATTACHMENT_BTN = "//div[contains(text(),'As attachment')]";
+        List<WebElement> iframe_element = driver.findElements(By.tagName("iframe"));
+//        int i = 0;
+//        for(WebElement w : iframe_element){
+//            System.out.println(i);
+//            System.out.println(w.getAttribute("name"));
+//            i++;
+//        }
+
+        WebElement lastIFrame = iframe_element.get(iframe_element.size() - 1);
+        driver.switchTo().frame(lastIFrame);
         WebElement btn = driverWait
                 .until(ExpectedConditions.elementToBeClickable(By.xpath(AS_ATTACHMENT_BTN)));
         System.out.println("Found!");
@@ -186,15 +186,17 @@ public class StepDefinitions {
     @And("^I click the Select Files From Your Device button and a file path as \"([^\"]*)\"$")
     public void iClickSelectFilesFromYourDevice(String filePath) throws Throwable {
         System.out.println("Attempting to find Select Files From Your Device button...");
-        String SELECT_FILES_DEVICE_BTN = "//div[contains(text(),'Select files from your device'";
+        String SELECT_FILES_DEVICE_BTN = "//div[contains(text(),'Select files from your device')]";
         WebElement btn = driverWait
                 .until(ExpectedConditions.elementToBeClickable(By.xpath(SELECT_FILES_DEVICE_BTN)));
         System.out.println("Found!");
         btn.click();
+        Thread.sleep(2000); // Clunky again, but not sure what else to do since we cant use selectors on Windows Explorer Dialog
         System.out.println("Attempting to type file path of desired file...");
         type(filePath);
         System.out.println("Done!");
     }
+
 
     /**
      * SENDING EMAIL / CHECKING FOR ERRORS / CHECKING FOR SENT EMAIL
@@ -205,8 +207,38 @@ public class StepDefinitions {
         System.out.println("Waiting on file upload to complete...");
         String xPathArg = "//div[contains(@aria-label, '" + ariaLabel + "')]";
         driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xPathArg)));
-        driverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xPathArg)));
+//        driverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xPathArg)));
         System.out.println("File upload complete!");
+    }
+
+    @Then("a notification appears checking access permissions")
+    public void accessPermissionsCheck(){
+
+        List<WebElement> iframe_element = driver.findElements(By.tagName("iframe"));
+        WebDriverWait accessDriverWait = new WebDriverWait(driver, 2);
+        int i = 0;
+        for(WebElement w : iframe_element){
+            driver.switchTo().parentFrame();
+            driver.switchTo().frame(w);
+            System.out.println(i++);
+            try {
+                accessDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(text(), 'Share with 1 person:')]")));
+                System.out.println("Attempting to find send file button in access window...");
+                WebElement sendBtn = accessDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Send')]")));
+                System.out.println("Clicking send file button in access window");
+                sendBtn.click();
+
+            } catch(NoSuchElementException e) {
+                System.out.println("bruh");
+                continue;
+            }
+            catch(Exception c) {
+                System.out.println("bruh");
+                continue;
+            }
+
+        }
+        driver.switchTo().parentFrame();
     }
 
     @And("^I click the Send button")
@@ -218,9 +250,15 @@ public class StepDefinitions {
         System.out.println("Found!");
         btn.click();
         System.out.println("Clicking Send button");
+    }
+
+    @Then("^the message sent notification appears")
+    public void messageSentAppears() throws Throwable {
         String messageSent = "//span[contains(text(), 'Message sent.')]";
         driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(messageSent)));
+        System.out.println("Message sent notification appeared.");
     }
+
 
     @And("^I click the Sent folder button")
     public void iClickSentFolderButton(){
@@ -231,10 +269,10 @@ public class StepDefinitions {
         btn.click();
     }
 
-    @Then("^my email should be displayed in the sent folder")
-    public void emailShouldBeDisplayed() throws Throwable {
+    @Then("^my email should be displayed in the sent folder with subject \"([^\"]*)\"$")
+    public void emailShouldBeDisplayed(String subjectString) throws Throwable {
         System.out.println("Attempting to find sent email in list of sent emails...");
-        String SENT_EMAIL = "//span[contains(text(),'ImageEmail')]";
+        String SENT_EMAIL = "//span[contains(text(),'" + subjectString + "')]";
         driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(SENT_EMAIL)));
         System.out.println("Email was found in sent folder!");
         driver.quit();
@@ -244,7 +282,7 @@ public class StepDefinitions {
     public void iShouldSeeAnErrorMessage(){
         System.out.println("Attempting to find error message...");
         String ERROR_MESSAGE = "//span[contains(text(),'Error')]";
-        driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(ERROR_MESSAGE)));
+        driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(ERROR_MESSAGE)));
         System.out.println("Found!");
         driver.quit();
     }
@@ -260,7 +298,7 @@ public class StepDefinitions {
             String PATH_TO_CHROME_DRIVER = "D:/UbuntuShared/chromedriver/chromedriver.exe";
             System.setProperty("webdriver.chrome.driver", PATH_TO_CHROME_DRIVER);
             driver = new ChromeDriver();
-            driverWait = new WebDriverWait(driver, 600);
+            driverWait = new WebDriverWait(driver, 10);
             System.out.println("Done!");
         }
     }
@@ -408,7 +446,5 @@ public class StepDefinitions {
         doType(keyCodes, offset + 1, length - 1);
         robot.keyRelease(keyCodes[offset]);
     }
-
-
 
 }
