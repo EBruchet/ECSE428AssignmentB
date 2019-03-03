@@ -22,12 +22,12 @@ public class StepDefinitions {
     private final String EMAIL_URL = "https://mail.google.com/mail/u/0/#inbox";
     private final String EMAIL_ADDRESS = "dreamteamlite@gmail.com";
     private final String EMAIL_PASSWORD = "Spaget1!";
-//    private final String EMAIL_SUBJECT = "Monoprice 115365 Monoprice Select Mini 3D Printer";
-//    private final String DELETE_BTN_NAME = "submit.delete.C3NLW69582M4B4";
-//    private final String CART_URL = "https://www.amazon.ca/gp/cart/view.html/ref=nav_cart";
-//    private final String ADD_TO_CART_BTN = "add-to-cart-button";
-//    private final String ACTIVE_CART = "sc-active-cart";
-//    private final String CHECKOUT_BTN = "sc-proceed-to-checkout";
+    private final String RECIPIENT_TEXT_BOX = ":18x";
+    private final String INSERT_PHOTO_BTN = ":1a5";
+    private final String SEND_BTN = ":185";
+    private final String ATTACH_FILE_BTN = ":19x";
+    private final String ATTACHMENT_BTN = "//div[contains(text(),'As Attachment')]";
+    private final String COMPOSE_BTN = "//div[contains(text(),'Compose')]";
 
 
     @Given("^I am on a Gmail page$")
@@ -38,17 +38,21 @@ public class StepDefinitions {
 
     @And("^I am logged in$")
     public void iAmLoggedIn() throws Throwable{
-        System.out.println("Checking to see if logged in by attempting to find Compose button...");
-        WebElement btn = (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[contains(text(),'Compose')]")));
-        System.out.println("Found!");
+        driver.findElement(By.id("identifierId")).sendKeys(EMAIL_ADDRESS);
+        driver.findElement(By.id("identifierNext")).click();
+        driver.findElement(By.id("password")).sendKeys(EMAIL_PASSWORD);
+        driver.findElement(By.id("passwordNext")).click();
+        // System.out.println("Checking to see if logged in by attempting to find Compose button...");
+        // WebElement btn = (new WebDriverWait(driver, 10))
+        //     .until(ExpectedConditions.presenceOfElementLocated(By.xpath(COMPOSE_BTN)));
+        // System.out.println("Found!");
     }
 
     @When("^I click on the Compose button")
     public void iClickComposeButton() throws Throwable{
         System.out.println("Checking to see if logged in by attempting to find Compose button...");
         WebElement btn = (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(text(),'Compose')]")));
+            .until(ExpectedConditions.elementToBeClickable(By.xpath(COMPOSE_BTN)));
         System.out.println("Found!");
         btn.click();
         System.out.println("Clicking Compose button");
@@ -57,7 +61,7 @@ public class StepDefinitions {
     @And("^I specify a valid email address$")
     public void iSpecifyValidEmail() throws Throwable{
         System.out.println("Attempting to find recipient textbox...");
-        WebElement recipient = driver.findElement(By.id(":18x"));
+        WebElement recipient = driver.findElement(By.id(RECIPIENT_TEXT_BOX));
         System.out.println("Found!");
         recipient.clear();
         String email = ""; //TODO: Need to take random email from bank of valid emails
@@ -68,7 +72,7 @@ public class StepDefinitions {
     public void iClickAttachFile() throws Throwable{
         System.out.println("Attempting to find Attach File button...");
         WebElement btn = (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.id(":19x")));
+            .until(ExpectedConditions.elementToBeClickable(By.id(ATTACH_FILE_BTN)));
         System.out.println("Found!");
         btn.click();
         System.out.println("Clicking Attach File button");
@@ -84,18 +88,17 @@ public class StepDefinitions {
     public void iClickSend() throws Throwable{
         System.out.println("Attempting to find Send button...");
         WebElement btn = (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.id(":185")));
+            .until(ExpectedConditions.elementToBeClickable(By.id(SEND_BTN)));
         System.out.println("Found!");
         btn.click();
         System.out.println("Clicking Send button");
     }
 
-
     @And("^I click on the Insert Photo button")
     public void iClickInsertPhoto() throws Throwable{
         System.out.println("Attempting to find Insert Photo button...");
         WebElement btn = (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.id(":1a5")));
+            .until(ExpectedConditions.elementToBeClickable(By.id(INSERT_PHOTO_BTN)));
         System.out.println("Found!");
         btn.click();
         System.out.println("Clicking Insert Photo button");
@@ -105,7 +108,7 @@ public class StepDefinitions {
     public void iClickAsAttachment() throws Throwable{
         System.out.println("Attempting to find As Attachment button...");
         WebElement btn = (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(text(),'As Attachment')]")));
+            .until(ExpectedConditions.elementToBeClickable(By.xpath(ATTACHMENT_BTN)));
         System.out.println("Found!");
         btn.click();
         System.out.println("Clicking As Attachment button");
@@ -114,7 +117,7 @@ public class StepDefinitions {
     @And("^I specify an invalid email address")
     public void iSpecifyInvalidEmail() throws Throwable{
         System.out.println("Attempting to find recipient textbox...");
-        WebElement recipient = driver.findElement(By.id(":18x"));
+        WebElement recipient = driver.findElement(By.id(RECIPIENT_TEXT_BOX));
         System.out.println("Found!");
         recipient.clear();
         String email = ""; //TODO: Need to take random email from bank of invalid emails
