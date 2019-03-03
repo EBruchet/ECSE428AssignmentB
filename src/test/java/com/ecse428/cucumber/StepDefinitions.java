@@ -6,6 +6,7 @@ import cucumber.annotation.en.Then;
 import cucumber.annotation.en.When;
 import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -19,13 +20,13 @@ public class StepDefinitions {
 
     private WebDriver driver;
     private final String PATH_TO_CHROME_DRIVER = "D:/UbuntuShared/chromedriver/chromedriver.exe";
-    private final String EMAIL_URL = "https://mail.google.com/mail/u/0/#inbox";
+    private final String EMAIL_URL = "https://accounts.google.com/signin/v2/sl/pwd?service=mail&passive=true&rm=false&continue=https%3A%2F%2Fmail.google.com%2Fmail%2F&ss=1&scc=1&ltmpl=default&ltmplcache=2&emr=1&osid=1&flowName=GlifWebSignIn&flowEntry=ServiceLogin&cid=1&navigationDirection=forward";
     private final String EMAIL_ADDRESS = "dreamteamlite@gmail.com";
     private final String EMAIL_PASSWORD = "Spaget1!";
-    private final String RECIPIENT_TEXT_BOX = ":18x";
+    private final String RECIPIENT_TEXT_BOX = "to";
     private final String INSERT_PHOTO_BTN = ":1a5";
     private final String SEND_BTN = ":185";
-    private final String ATTACH_FILE_BTN = ":19x";
+    private final String ATTACH_FILE_BTN = "//div[contains(@aria-label,'Attach files')]";
     private final String ATTACHMENT_BTN = "//div[contains(text(),'As Attachment')]";
     private final String COMPOSE_BTN = "//div[contains(text(),'Compose')]";
 
@@ -40,7 +41,9 @@ public class StepDefinitions {
     public void iAmLoggedIn() throws Throwable{
         driver.findElement(By.id("identifierId")).sendKeys(EMAIL_ADDRESS);
         driver.findElement(By.id("identifierNext")).click();
-        driver.findElement(By.id("password")).sendKeys(EMAIL_PASSWORD);
+        new WebDriverWait(driver, 10)
+                .until(ExpectedConditions.elementToBeClickable(By.name("password")));
+        driver.findElement(By.name("password")).sendKeys(EMAIL_PASSWORD);
         driver.findElement(By.id("passwordNext")).click();
         // System.out.println("Checking to see if logged in by attempting to find Compose button...");
         // WebElement btn = (new WebDriverWait(driver, 10))
@@ -61,10 +64,10 @@ public class StepDefinitions {
     @And("^I specify a valid email address$")
     public void iSpecifyValidEmail() throws Throwable{
         System.out.println("Attempting to find recipient textbox...");
-        WebElement recipient = driver.findElement(By.id(RECIPIENT_TEXT_BOX));
+        WebElement recipient = driver.findElement(By.name(RECIPIENT_TEXT_BOX));
         System.out.println("Found!");
         recipient.clear();
-        String email = ""; //TODO: Need to take random email from bank of valid emails
+        String email = "ansldfjasdjfasdlf"; //TODO: Need to take random email from bank of valid emails
         recipient.sendKeys(email);
     }
 
@@ -72,15 +75,16 @@ public class StepDefinitions {
     public void iClickAttachFile() throws Throwable{
         System.out.println("Attempting to find Attach File button...");
         WebElement btn = (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.id(ATTACH_FILE_BTN)));
+            .until(ExpectedConditions.elementToBeClickable(By.xpath(ATTACH_FILE_BTN)));
         System.out.println("Found!");
-        btn.click();
+        btn.sendKeys("C:\\Users\\Evan\\Downloads\\Spicy.PNG");
+
+//        btn.click();
         System.out.println("Clicking Attach File button");
     }
 
     @And("^I select the desired image")
     public void iSelectValidImage() throws Throwable{
-
 
     }
 
