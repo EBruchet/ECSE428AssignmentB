@@ -4,6 +4,7 @@ import cucumber.annotation.en.And;
 import cucumber.annotation.en.Given;
 import cucumber.annotation.en.Then;
 import cucumber.annotation.en.When;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -13,6 +14,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.net.MalformedURLException;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static java.awt.event.KeyEvent.*;
@@ -20,113 +23,104 @@ import static java.awt.event.KeyEvent.*;
 
 public class StepDefinitions {
 
-    boolean waitRobot = false;
+    private boolean waitRobot = false;
 
     private WebDriver driver;
-    private final String PATH_TO_CHROME_DRIVER = "D:/UbuntuShared/chromedriver/chromedriver.exe";
-    private final String EMAIL_URL = "https://accounts.google.com/signin/v2/sl/pwd?service=mail&passive=true&rm=false&continue=https%3A%2F%2Fmail.google.com%2Fmail%2F&ss=1&scc=1&ltmpl=default&ltmplcache=2&emr=1&osid=1&flowName=GlifWebSignIn&flowEntry=ServiceLogin&cid=1&navigationDirection=forward";
-    private final String EMAIL_ADDRESS = "dreamteamlite@gmail.com";
-    private final String EMAIL_PASSWORD = "Spaget1!";
+    private WebDriverWait driverWait;
+
     private final String RECIPIENT_TEXT_BOX = "to";
     private final String SUBJECT_TEXT_BOX = "subjectbox";
-    private final String INSERT_PHOTO_BTN = ":1a5";
-    private final String SEND_BTN = "//div[contains(text(),'Send')]";
-    private final String ATTACH_FILE_BTN = "//div[contains(@aria-label,'Attach files')]";
-    private final String ATTACHMENT_BTN = "//div[contains(text(),'As Attachment')]";
-    private final String COMPOSE_BTN = "//div[contains(text(),'Compose')]";
+    private final String SENT_EMAIL_SUBJECT = "ImageEmail";
+
+    /**
+    * BACKGROUND SECTION
+    * */
 
     @Given("^I am on a Gmail page$")
     public void givenOnGmailPage() throws Throwable{
         setupSeleniumWebDrivers();
+        String EMAIL_URL = "https://accounts.google.com/signin/v2/sl/pwd?service=mail&passive=true&rm=false&continue=https%3A%2F%2Fmail.google.com%2Fmail%2F&ss=1&scc=1&ltmpl=default&ltmplcache=2&emr=1&osid=1&flowName=GlifWebSignIn&flowEntry=ServiceLogin&cid=1&navigationDirection=forward";
         goTo(EMAIL_URL);
     }
 
     @And("^I am logged in$")
     public void iAmLoggedIn() throws Throwable{
+        String EMAIL_ADDRESS = "dreamteamlite@gmail.com";
         driver.findElement(By.id("identifierId")).sendKeys(EMAIL_ADDRESS);
         driver.findElement(By.id("identifierNext")).click();
-        new WebDriverWait(driver, 10)
-                .until(ExpectedConditions.elementToBeClickable(By.name("password")));
+        driverWait.until(ExpectedConditions.elementToBeClickable(By.name("password")));
+        String EMAIL_PASSWORD = "Spaget1!";
         driver.findElement(By.name("password")).sendKeys(EMAIL_PASSWORD);
         driver.findElement(By.id("passwordNext")).click();
-        // System.out.println("Checking to see if logged in by attempting to find Compose button...");
-        // WebElement btn = (new WebDriverWait(driver, 10))
-        //     .until(ExpectedConditions.presenceOfElementLocated(By.xpath(COMPOSE_BTN)));
-        // System.out.println("Found!");
     }
 
     @When("^I click on the Compose button")
     public void iClickComposeButton() throws Throwable{
         System.out.println("Checking to see if logged in by attempting to find Compose button...");
-        WebElement btn = (new WebDriverWait(driver, 10))
+        String COMPOSE_BTN = "//div[contains(text(),'Compose')]";
+        WebElement btn = driverWait
             .until(ExpectedConditions.elementToBeClickable(By.xpath(COMPOSE_BTN)));
         System.out.println("Found!");
         btn.click();
         System.out.println("Clicking Compose button");
-    }    
+    }
+
+
+    /**
+     * E-MAIL / SUBJECT SPECIFICATION
+     * */
 
     @And("^I specify a valid email address as \"([^\"]*)\"$")
-    public void iSpecifyValidEmail(String arg1) throws Throwable{
+    public void iSpecifyValidEmail(String validEmail) throws Throwable{
         System.out.println("Attempting to find recipient textbox...");
-        WebElement recipient = (new WebDriverWait(driver, 10))
+        WebElement recipient = driverWait
                 .until(ExpectedConditions.elementToBeClickable(By.name(RECIPIENT_TEXT_BOX)));
-        WebElement subject = (new WebDriverWait(driver, 10))
+        WebElement subject = driverWait
                 .until(ExpectedConditions.elementToBeClickable(By.name(SUBJECT_TEXT_BOX)));
         System.out.println("Found!");
         recipient.clear();
         subject.clear();
-        String subjectString = "Subject";
-        String email = "dreamteamlite@gmail.com"; //TODO: Need to take random email from bank of valid emails
-        recipient.sendKeys(arg1);
-        subject.sendKeys(subjectString);
+        recipient.sendKeys(validEmail);
+        subject.sendKeys(SENT_EMAIL_SUBJECT);
     }
+
+    @And("^I specify an invalid email address as \"([^\"]*)\"$")
+    public void iSpecifyInvalidEmail(String invalidEmail) throws Throwable{
+        System.out.println("Attempting to find recipient textbox...");
+        WebElement invalidRecipient = driverWait
+                .until(ExpectedConditions.elementToBeClickable(By.name(RECIPIENT_TEXT_BOX)));
+        WebElement subject = driverWait
+                .until(ExpectedConditions.elementToBeClickable(By.name(SUBJECT_TEXT_BOX)));
+        System.out.println("Found!");
+        invalidRecipient.clear();
+        subject.clear();
+        invalidRecipient.sendKeys(invalidEmail);
+        subject.sendKeys(SENT_EMAIL_SUBJECT);
+    }
+
+    /**
+     * ATTACH FILE / INSERT PHOTO
+     * */
 
     @And("^I click on the Attach File button$")
     public void iClickAttachFile() throws Throwable{
         System.out.println("Attempting to find Attach File button...");
-        WebElement btn = (new WebDriverWait(driver, 10))
+        String ATTACH_FILE_BTN = "//div[contains(@aria-label,'Attach files')]";
+        WebElement btn = driverWait
             .until(ExpectedConditions.elementToBeClickable(By.xpath(ATTACH_FILE_BTN)));
         System.out.println("Found!");
 
         btn.click();
 
-        System.out.println("Clicking Attach File button\n");
-    }
-
-    @And("^I select the desired image as \"([^\"]*)\"$")
-    public void iSelectValidImage(String arg1) throws Throwable{
-        System.out.println("Attempting to type file path...");
-        type(arg1);
-
-
-        Robot robot = new Robot();
-        robot.keyPress(KeyEvent.VK_ENTER);
-        robot.keyRelease(KeyEvent.VK_ENTER);
-        System.out.println("Done!");
-        waitRobot = true;
-    }
-
-    @And("^I click the Send button")
-    public void iClickSend() throws Throwable{
-        while(!waitRobot){
-            System.out.println("wtf");
-        }
-        Thread.sleep(5000);
-        System.out.print("Attempting to find Send button...");
-        WebElement btn = (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.xpath(SEND_BTN)));
-        System.out.println("Found!\n");
-        btn.click();
-        System.out.println("Clicking Send button");
-        Thread.sleep(3000);
-        driver.quit();
+        System.out.println("Clicking Attach File button");
     }
 
     @And("^I click on the Insert Photo button")
     public void iClickInsertPhoto() throws Throwable{
         System.out.println("Attempting to find Insert Photo button...");
-        WebElement btn = (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.id(INSERT_PHOTO_BTN)));
+        String INSERT_PHOTO_BTN = "//div[contains(@aria-label, 'Insert photo')]";
+        WebElement btn = driverWait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(INSERT_PHOTO_BTN)));
         System.out.println("Found!");
         btn.click();
         System.out.println("Clicking Insert Photo button");
@@ -134,30 +128,140 @@ public class StepDefinitions {
 
     @And("^I click the As Attachment button")
     public void iClickAsAttachment() throws Throwable{
+        String parentWindowHandler = driver.getWindowHandle(); // Store your parent window
+        String subWindowHandler = null;
+
+        Set<String> handles = driver.getWindowHandles(); // get all window handles
+        Iterator<String> iterator = handles.iterator();
+        while (iterator.hasNext()){
+            subWindowHandler = iterator.next();
+        }
+        driver.switchTo().window(subWindowHandler);
         System.out.println("Attempting to find As Attachment button...");
-        WebElement btn = (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.xpath(ATTACHMENT_BTN)));
+        String AS_ATTACHMENT_BTN = "//div[contains(@value,'attach')]";
+        WebElement btn = driverWait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(AS_ATTACHMENT_BTN)));
         System.out.println("Found!");
         btn.click();
         System.out.println("Clicking As Attachment button");
     }
 
-    @And("^I specify an invalid email address")
-    public void iSpecifyInvalidEmail() throws Throwable{
-        System.out.println("Attempting to find recipient textbox...");
-        WebElement recipient = driver.findElement(By.id(RECIPIENT_TEXT_BOX));
-        System.out.println("Found!");
-        recipient.clear();
-        String email = ""; //TODO: Need to take random email from bank of invalid emails
-        recipient.sendKeys(email);
+
+    /**
+     * IMAGE SELECTION
+     */
+
+    @And("^I select the desired image as \"([^\"]*)\"$")
+    public void iSelectValidImage(String filePath) throws Throwable{
+        System.out.println("Attempting to type file path...");
+        type(filePath);
+        System.out.println("Done!");
     }
+
+    @And("^I select the desired large image as \"([^\"]*)\"$")
+    public void iSelectLargeImage(String filePath) throws Throwable {
+        System.out.println("Attempting to type file path...");
+        type(filePath);
+        System.out.println("Done!");
+    }
+
+    @Then("^a notification appears saying the large file is being sent as a Google Drive Link")
+    public void largeImageNotification(){
+        System.out.println("Waiting for file attachment message to disappear...");
+        String LARGE_FILE_NOTIFICATION = "//span[contains(text(),'Attaching File')]";
+        driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(LARGE_FILE_NOTIFICATION)));
+        driverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(LARGE_FILE_NOTIFICATION)));
+        System.out.println("Done!");
+
+    }
+
+    @Then("^the Google Drive Link appears in email with name \"([^\"]*)\"$")
+    public void googleDriveLinkAppears(String fileName){
+        System.out.println("Checking for Drive link in email...");
+        String driveLink = "//span[contains(text(),'" + fileName + "')]";
+        driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(driveLink)));
+        System.out.println("Found!");
+    }
+
+    @And("^I click the Select Files From Your Device button and a file path as \"([^\"]*)\"$")
+    public void iClickSelectFilesFromYourDevice(String filePath) throws Throwable {
+        System.out.println("Attempting to find Select Files From Your Device button...");
+        String SELECT_FILES_DEVICE_BTN = "//div[contains(text(),'Select files from your device'";
+        WebElement btn = driverWait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(SELECT_FILES_DEVICE_BTN)));
+        System.out.println("Found!");
+        btn.click();
+        System.out.println("Attempting to type file path of desired file...");
+        type(filePath);
+        System.out.println("Done!");
+    }
+
+    /**
+     * SENDING EMAIL / CHECKING FOR ERRORS / CHECKING FOR SENT EMAIL
+     */
+
+    @Then("^completed the upload of file named \"([^\"]*)\"$")
+    public void fileUploadCompleted(String ariaLabel){
+        System.out.println("Waiting on file upload to complete...");
+        String xPathArg = "//div[contains(@aria-label, '" + ariaLabel + "')]";
+        driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xPathArg)));
+        driverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xPathArg)));
+        System.out.println("File upload complete!");
+    }
+
+    @And("^I click the Send button")
+    public void iClickSend() throws Throwable{
+        while(!waitRobot); // TODO: Figure out why sometimes the Robot doesn't seem to type / doesn't wait for input
+        System.out.println("Attempting to find Send button...");
+        String SEND_BTN = "//div[contains(text(),'Send')]";
+        WebElement btn = driverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(SEND_BTN)));
+        System.out.println("Found!");
+        btn.click();
+        System.out.println("Clicking Send button");
+        String messageSent = "//span[contains(text(), 'Message sent.')]";
+        driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(messageSent)));
+    }
+
+    @And("^I click the Sent folder button")
+    public void iClickSentFolderButton(){
+        System.out.println("Attempting to find Sent Folder button...");
+        String SENT_FOLDER_BTN = "//a[contains(@aria-label,'Sent')]";
+        WebElement btn = driverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(SENT_FOLDER_BTN)));
+        System.out.println("Found!");
+        btn.click();
+    }
+
+    @Then("^my email should be displayed in the sent folder")
+    public void emailShouldBeDisplayed() throws Throwable {
+        System.out.println("Attempting to find sent email in list of sent emails...");
+        String SENT_EMAIL = "//span[contains(text(),'ImageEmail')]";
+        driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(SENT_EMAIL)));
+        System.out.println("Email was found in sent folder!");
+        driver.quit();
+    }
+
+    @Then("I should see an error message")
+    public void iShouldSeeAnErrorMessage(){
+        System.out.println("Attempting to find error message...");
+        String ERROR_MESSAGE = "//span[contains(text(),'Error')]";
+        driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(ERROR_MESSAGE)));
+        System.out.println("Found!");
+        driver.quit();
+    }
+
+
+    /**
+     * SELENIUM SETUP
+     */
 
     private void setupSeleniumWebDrivers() throws MalformedURLException {
         if (driver == null) {
             System.out.println("Setting up Selenium ChromeDriver...");
+            String PATH_TO_CHROME_DRIVER = "D:/UbuntuShared/chromedriver/chromedriver.exe";
             System.setProperty("webdriver.chrome.driver", PATH_TO_CHROME_DRIVER);
             driver = new ChromeDriver();
-            System.out.print("Done!\n");
+            driverWait = new WebDriverWait(driver, 600);
+            System.out.println("Done!");
         }
     }
 
@@ -169,6 +273,9 @@ public class StepDefinitions {
     }
 
 
+    /**
+     * ROBOT TYPING METHODS
+     */
 
     public void type(CharSequence characters) throws AWTException{
         int length = characters.length();
@@ -176,8 +283,11 @@ public class StepDefinitions {
             char character = characters.charAt(i);
             type(character);
         }
+        Robot robot = new Robot();
+        robot.keyPress(KeyEvent.VK_ENTER);
+        robot.keyRelease(KeyEvent.VK_ENTER);
+        waitRobot = true;
     }
-
 
     public void type(char character) throws AWTException{
         switch (character) {
@@ -282,7 +392,6 @@ public class StepDefinitions {
                 throw new IllegalArgumentException("Cannot type character " + character);
         }
     }
-
 
     private void doType(int... keyCodes) throws AWTException{
         doType(keyCodes, 0, keyCodes.length);
