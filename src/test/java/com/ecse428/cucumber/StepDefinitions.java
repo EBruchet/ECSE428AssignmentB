@@ -35,6 +35,9 @@ public class StepDefinitions {
     * BACKGROUND SECTION
     * */
 
+    /**
+     * Sends browser to Gmail log in page
+     */
     @Given("^I am on a Gmail page$")
     public void givenOnGmailPage() throws Throwable{
         setupSeleniumWebDrivers();
@@ -42,6 +45,9 @@ public class StepDefinitions {
         goTo(EMAIL_URL);
     }
 
+    /**
+     * Logs into dummy gmail account by entering user and password
+     */
     @And("^I am logged in$")
     public void iAmLoggedIn() throws Throwable{
         String EMAIL_ADDRESS = "dreamteamlite@gmail.com";
@@ -53,6 +59,9 @@ public class StepDefinitions {
         driver.findElement(By.id("passwordNext")).click();
     }
 
+    /**
+     * Clicking on compose button whenever desired to compose an email
+     */
     @When("^I click on the Compose button")
     public void iClickComposeButton() throws Throwable{
         System.out.println("Checking to see if logged in by attempting to find Compose button...");
@@ -99,6 +108,7 @@ public class StepDefinitions {
 
     /**
      * ATTACH FILE / INSERT PHOTO
+     * Only involves clicking the appropriate button to attach or insert image/file
      * */
 
     @And("^I click on the Attach File button$")
@@ -108,9 +118,7 @@ public class StepDefinitions {
         WebElement btn = driverWait
             .until(ExpectedConditions.elementToBeClickable(By.xpath(ATTACH_FILE_BTN)));
         System.out.println("Found!");
-
         btn.click();
-
         System.out.println("Clicking Attach File button");
     }
 
@@ -130,7 +138,8 @@ public class StepDefinitions {
         System.out.println("Attempting to find As Attachment button...");
         String AS_ATTACHMENT_BTN = "//div[contains(text(),'As attachment')]";
         List<WebElement> iframe_element = driver.findElements(By.tagName("iframe"));
-
+        // Need to select appropriate iframe to retrieve desired button to click
+        // This iframe happens to always be the last one
         WebElement lastIFrame = iframe_element.get(iframe_element.size() - 1);
         driver.switchTo().frame(lastIFrame);
         WebElement btn = driverWait
@@ -143,6 +152,8 @@ public class StepDefinitions {
 
     /**
      * IMAGE SELECTION
+     * Using 'Robot' to type in the filepath when the window explorer dialog opens
+     * Some methods involve the checking and accepting to upload the file as Google Drive Link
      */
 
     @And("^I select the desired image as \"([^\"]*)\"$")
@@ -185,7 +196,7 @@ public class StepDefinitions {
                 .until(ExpectedConditions.elementToBeClickable(By.xpath(SELECT_FILES_DEVICE_BTN)));
         System.out.println("Found!");
         btn.click();
-        Thread.sleep(2000); // Clunky again, but not sure what else to do since we cant use selectors on Windows Explorer Dialog
+        Thread.sleep(2000); // Clunky, but no other options since we cant use selectors on Windows Explorer Dialog
         System.out.println("Attempting to type file path of desired file...");
         type(filePath);
         System.out.println("Done!");
@@ -193,7 +204,7 @@ public class StepDefinitions {
 
 
     /**
-     * SENDING EMAIL / CHECKING FOR ERRORS / CHECKING FOR SENT EMAIL
+     * SENDING EMAIL / CHECKING FOR ERRORS
      */
 
     @Then("^completed the upload of file named \"([^\"]*)\"$")
@@ -204,6 +215,9 @@ public class StepDefinitions {
         System.out.println("File upload complete!");
     }
 
+    // The notification iframe for granting access permissions to Google Drive Link dynamically appears 
+    // and is never in the same place or with the same id
+    // Hence why it is necessary to loop through the iframes to find it 
     @Then("a notification appears checking access permissions")
     public void accessPermissionsCheck(){
 
@@ -213,7 +227,6 @@ public class StepDefinitions {
         for(WebElement w : iframe_element){
             driver.switchTo().parentFrame();
             driver.switchTo().frame(w);
-            System.out.println(i++);
             try {
                 accessDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(text(), 'Share with 1 person:')]")));
                 System.out.println("Attempting to find send file button in access window...");
@@ -222,11 +235,9 @@ public class StepDefinitions {
                 sendBtn.click();
 
             } catch(NoSuchElementException e) {
-                System.out.println("bruh");
                 continue;
             }
-            catch(Exception c) {
-                System.out.println("bruh");
+            catch(Exception e) {
                 continue;
             }
 
@@ -244,6 +255,10 @@ public class StepDefinitions {
         btn.click();
         System.out.println("Clicking Send button");
     }
+
+    /**
+     * CHECKING FOR SENT EMAIL OR ERROR
+     */
 
     @Then("^the message sent notification appears")
     public void messageSentAppears() throws Throwable {
@@ -282,9 +297,8 @@ public class StepDefinitions {
 
 
     /**
-     * SELENIUM SETUP
+     * Selenium web driver setup, creates driver object
      */
-
     private void setupSeleniumWebDrivers() throws MalformedURLException {
         if (driver == null) {
             System.out.println("Setting up Selenium ChromeDriver...");
@@ -296,6 +310,9 @@ public class StepDefinitions {
         }
     }
 
+    /**
+     * Method to switch to another given url
+     */
     private void goTo(String url) {
         if (driver != null) {
             System.out.println("Going to " + url);
@@ -305,7 +322,7 @@ public class StepDefinitions {
 
 
     /**
-     * ROBOT TYPING METHODS
+     * Robot typing methods; converts string into a sequence of key presses and releases to simulate typing
      */
 
     public void type(CharSequence characters) throws AWTException{
