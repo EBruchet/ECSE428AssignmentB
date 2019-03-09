@@ -130,12 +130,6 @@ public class StepDefinitions {
         System.out.println("Attempting to find As Attachment button...");
         String AS_ATTACHMENT_BTN = "//div[contains(text(),'As attachment')]";
         List<WebElement> iframe_element = driver.findElements(By.tagName("iframe"));
-//        int i = 0;
-//        for(WebElement w : iframe_element){
-//            System.out.println(i);
-//            System.out.println(w.getAttribute("name"));
-//            i++;
-//        }
 
         WebElement lastIFrame = iframe_element.get(iframe_element.size() - 1);
         driver.switchTo().frame(lastIFrame);
@@ -207,7 +201,6 @@ public class StepDefinitions {
         System.out.println("Waiting on file upload to complete...");
         String xPathArg = "//div[contains(@aria-label, '" + ariaLabel + "')]";
         driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xPathArg)));
-//        driverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xPathArg)));
         System.out.println("File upload complete!");
     }
 
@@ -243,7 +236,7 @@ public class StepDefinitions {
 
     @And("^I click the Send button")
     public void iClickSend() throws Throwable{
-        while(!waitRobot); // TODO: Figure out why sometimes the Robot doesn't seem to type / doesn't wait for input
+        while(!waitRobot); 
         System.out.println("Attempting to find Send button...");
         String SEND_BTN = "//div[contains(text(),'Send')]";
         WebElement btn = driverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(SEND_BTN)));
