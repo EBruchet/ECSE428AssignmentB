@@ -60,9 +60,9 @@ Feature: Send an email with an attached images
     When I send the email
     Then I should see an error message
     Examples:
-      | email   | path | filename |
-      | asdf | C:\Users\Evan\Downloads\Spicy.PNG |Attachment: Spicy.PNG. Press enter to view the attachment and delete to remove it |
-      | fsda | C:\Users\Evan\Downloads\Ran.jpg | Attachment: Ran.jpg. Press enter to view the attachment and delete to remove it |
-      | yeet | C:\Users\Evan\Downloads\KidA.png |  Attachment: KidA.png. Press enter to view the attachment and delete to remove it |
-      | yata | C:\Users\Evan\Downloads\MBDTF.jpg | Attachment: MBDTF.jpg. Press enter to view the attachment and delete to remove it |
-      | spaget | C:\Users\Evan\Downloads\KSG.png | Attachment: KSG.png. Press enter to view the attachment and delete to remove it |
+      | email   | path | 
+      | asdf | C:\Users\Evan\Downloads\Spicy.PNG |
+      | fsda | C:\Users\Evan\Downloads\Ran.jpg | 
+      | yeet | C:\Users\Evan\Downloads\KidA.png |  
+      | yata | C:\Users\Evan\Downloads\MBDTF.jpg | 
+      | spaget | C:\Users\Evan\Downloads\KSG.png | 

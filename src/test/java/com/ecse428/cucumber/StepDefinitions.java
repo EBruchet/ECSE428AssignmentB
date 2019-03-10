@@ -73,9 +73,6 @@ public class StepDefinitions {
         System.out.println("Clicking Compose button");
     }
 
-
-
-
     /**
      * E-MAIL / SUBJECT SPECIFICATION
      * */
@@ -112,9 +109,7 @@ public class StepDefinitions {
     /**
      * ATTACH FILE / INSERT PHOTO
      * Only involves clicking the appropriate button to attach or insert image/file
-     * */
-
-    /**
+     *
      * IMAGE SELECTION
      * Using 'Robot' to type in the filepath when the window explorer dialog opens
      * Some methods involve the checking and accepting to upload the file as Google Drive Link
@@ -189,7 +184,9 @@ public class StepDefinitions {
         System.out.println("Done!");
     }
 
-
+    /**
+     * Checking that file was properly uploaded
+     */
 
     @Then("^the file is uploaded to Google Drive with name \"([^\"]*)\" and with a shareable link$")
     public void fileUploadedToGoogleDrive(String fileName){
@@ -231,21 +228,19 @@ public class StepDefinitions {
                 WebElement sendBtn = accessDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Send')]")));
                 System.out.println("Clicking send file button in access window");
                 sendBtn.click();
-
             } catch(NoSuchElementException e) {
                 continue;
             }
             catch(Exception e) {
                 continue;
             }
-
         }
         driver.switchTo().parentFrame();
     }
 
 
     /**
-     * SENDING EMAIL / CHECKING FOR ERRORS
+     * SENDING EMAIL
      */
     @When("^I send the email")
     public void iClickSend() throws Throwable{
