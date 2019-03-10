@@ -4,6 +4,7 @@ import cucumber.annotation.en.And;
 import cucumber.annotation.en.Given;
 import cucumber.annotation.en.Then;
 import cucumber.annotation.en.When;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -30,6 +31,9 @@ public class StepDefinitions {
     private final String RECIPIENT_TEXT_BOX = "to";
     private final String SUBJECT_TEXT_BOX = "subjectbox";
     private final String SENT_EMAIL_SUBJECT = "ImageEmail";
+
+    private String generatedSuffix;
+
 
     /**
     * BACKGROUND SECTION
@@ -79,6 +83,7 @@ public class StepDefinitions {
 
     @And("^I specify a valid email address as \"([^\"]*)\" with subject \"([^\"]*)\"$")
     public void iSpecifyValidEmail(String validEmail, String subjectString) throws Throwable{
+        this.generatedSuffix = RandomStringUtils.randomAlphanumeric(10);
         System.out.println("Attempting to find recipient textbox...");
         WebElement recipient = driverWait
                 .until(ExpectedConditions.elementToBeClickable(By.name(RECIPIENT_TEXT_BOX)));
@@ -88,7 +93,7 @@ public class StepDefinitions {
         recipient.clear();
         subject.clear();
         recipient.sendKeys(validEmail);
-        subject.sendKeys(subjectString);
+        subject.sendKeys(subjectString + generatedSuffix);
     }
 
     @And("^I specify an invalid email address as \"([^\"]*)\"$")
@@ -219,22 +224,12 @@ public class StepDefinitions {
         List<WebElement> iframe_element = driver.findElements(By.tagName("iframe"));
         WebDriverWait accessDriverWait = new WebDriverWait(driver, 2);
         int i = 0;
-        for(WebElement w : iframe_element){
-            driver.switchTo().parentFrame();
-            driver.switchTo().frame(w);
-            try {
-                accessDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(text(), 'Share with 1 person:')]")));
-                System.out.println("Attempting to find send file button in access window...");
-                WebElement sendBtn = accessDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Send')]")));
-                System.out.println("Clicking send file button in access window");
-                sendBtn.click();
-            } catch(NoSuchElementException e) {
-                continue;
-            }
-            catch(Exception e) {
-                continue;
-            }
-        }
+        //div[contains(@aria-label,'Attach files')]
+        WebElement accessIFrame = driver.findElement(By.xpath("//iframe[contains(@class,'Qr-Mr-Jz-avO')]"));
+        driver.switchTo().frame(accessIFrame);
+        driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(text(), 'Share with 1 person:')]")));
+        WebElement sendBtn = driverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Send')]")));
+        sendBtn.click();
         driver.switchTo().parentFrame();
     }
 
@@ -268,7 +263,7 @@ public class StepDefinitions {
         System.out.println("Found!");
         btn.click();
         System.out.println("Attempting to find sent email in list of sent emails...");
-        String SENT_EMAIL = "//span[contains(text(),'" + subject + "')]";
+        String SENT_EMAIL = "//span[contains(text(),'" + subject + generatedSuffix + "')]";
         driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(SENT_EMAIL)));
         System.out.println("Email was found in sent folder!");
         driver.quit();
