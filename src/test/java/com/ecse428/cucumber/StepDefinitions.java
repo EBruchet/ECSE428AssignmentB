@@ -62,7 +62,7 @@ public class StepDefinitions {
     /**
      * Clicking on compose button whenever desired to compose an email
      */
-    @When("^I click on the Compose button")
+    @When("^I compose an email")
     public void iClickComposeButton() throws Throwable{
         System.out.println("Checking to see if logged in by attempting to find Compose button...");
         String COMPOSE_BTN = "//div[contains(text(),'Compose')]";
@@ -72,6 +72,8 @@ public class StepDefinitions {
         btn.click();
         System.out.println("Clicking Compose button");
     }
+
+
 
 
     /**
@@ -106,49 +108,11 @@ public class StepDefinitions {
         subject.sendKeys(SENT_EMAIL_SUBJECT);
     }
 
+
     /**
      * ATTACH FILE / INSERT PHOTO
      * Only involves clicking the appropriate button to attach or insert image/file
      * */
-
-    @And("^I click on the Attach File button$")
-    public void iClickAttachFile() throws Throwable{
-        System.out.println("Attempting to find Attach File button...");
-        String ATTACH_FILE_BTN = "//div[contains(@aria-label,'Attach files')]";
-        WebElement btn = driverWait
-            .until(ExpectedConditions.elementToBeClickable(By.xpath(ATTACH_FILE_BTN)));
-        System.out.println("Found!");
-        btn.click();
-        System.out.println("Clicking Attach File button");
-    }
-
-    @And("^I click on the Insert Photo button")
-    public void iClickInsertPhoto() throws Throwable{
-        System.out.println("Attempting to find Insert Photo button...");
-        String INSERT_PHOTO_BTN = "//div[contains(@aria-label, 'Insert photo')]";
-        WebElement btn = driverWait
-                .until(ExpectedConditions.elementToBeClickable(By.xpath(INSERT_PHOTO_BTN)));
-        System.out.println("Found!");
-        btn.click();
-        System.out.println("Clicking Insert Photo button");
-    }
-
-    @And("^I click the As Attachment button")
-    public void iClickAsAttachment() throws Throwable{
-        System.out.println("Attempting to find As Attachment button...");
-        String AS_ATTACHMENT_BTN = "//div[contains(text(),'As attachment')]";
-        List<WebElement> iframe_element = driver.findElements(By.tagName("iframe"));
-        // Need to select appropriate iframe to retrieve desired button to click
-        // This iframe happens to always be the last one
-        WebElement lastIFrame = iframe_element.get(iframe_element.size() - 1);
-        driver.switchTo().frame(lastIFrame);
-        WebElement btn = driverWait
-                .until(ExpectedConditions.elementToBeClickable(By.xpath(AS_ATTACHMENT_BTN)));
-        System.out.println("Found!");
-        btn.click();
-        System.out.println("Clicking As Attachment button");
-    }
-
 
     /**
      * IMAGE SELECTION
@@ -156,58 +120,91 @@ public class StepDefinitions {
      * Some methods involve the checking and accepting to upload the file as Google Drive Link
      */
 
-    @And("^I select the desired image as \"([^\"]*)\"$")
-    public void iSelectValidImage(String filePath) throws Throwable{
+    /**
+     * Attaching a valid image of size less than 25MB
+     */
+
+    @And("^I attach a valid image file as \"([^\"]*)\"$")
+    public void iAttachValidImageFile(String path) throws AWTException{
+        System.out.println("Attempting to find Attach File button...");
+        String ATTACH_FILE_BTN = "//div[contains(@aria-label,'Attach files')]";
+        WebElement btn = driverWait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(ATTACH_FILE_BTN)));
+        System.out.println("Found!");
+        btn.click();
+        System.out.println("Clicking Attach File button");
         System.out.println("Attempting to type file path...");
-        type(filePath);
+        type(path);
         System.out.println("Done!");
     }
 
-    @And("^I select the desired large image as \"([^\"]*)\"$")
-    public void iSelectLargeImage(String filePath) throws Throwable {
+    /**
+     * Attaching a valid image of size greater than 25MB
+     */
+    @And("^I attach a valid image file of size greater than 25MB as \"([^\"]*)\"$")
+    public void iAttachValidLargeImage(String path) throws AWTException{
+        System.out.println("Attempting to find Attach File button...");
+        String ATTACH_FILE_BTN = "//div[contains(@aria-label,'Attach files')]";
+        WebElement btn = driverWait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(ATTACH_FILE_BTN)));
+        System.out.println("Found!");
+        btn.click();
+        System.out.println("Clicking Attach File button");
         System.out.println("Attempting to type file path...");
-        type(filePath);
+        type(path);
         System.out.println("Done!");
     }
 
-    @Then("^a notification appears saying the large file is being sent as a Google Drive Link")
-    public void largeImageNotification(){
+
+    @And("^I attach a valid image file as \"([^\"]*)\" by inserting a photo$")
+    public void iAttachUsingInsertAPhoto(String path) throws AWTException, InterruptedException{
+        System.out.println("Attempting to find Insert Photo button...");
+        String INSERT_PHOTO_BTN = "//div[contains(@aria-label, 'Insert photo')]";
+        WebElement btn = driverWait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(INSERT_PHOTO_BTN)));
+        System.out.println("Found!");
+        btn.click();
+        System.out.println("Clicking Insert Photo button");
+        System.out.println("Attempting to find As Attachment button...");
+        String AS_ATTACHMENT_BTN = "//div[contains(text(),'As attachment')]";
+        List<WebElement> iframe_element = driver.findElements(By.tagName("iframe"));
+        // Need to select appropriate iframe to retrieve desired button to click
+        // This iframe happens to always be the last one
+        WebElement lastIFrame = iframe_element.get(iframe_element.size() - 1);
+        driver.switchTo().frame(lastIFrame);
+        WebElement newBtn = driverWait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(AS_ATTACHMENT_BTN)));
+        System.out.println("Found!");
+        newBtn.click();
+        System.out.println("Clicking As Attachment button");
+        System.out.println("Attempting to find Select Files From Your Device button...");
+        String SELECT_FILES_DEVICE_BTN = "//div[contains(text(),'Select files from your device')]";
+        WebElement secBtn = driverWait
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(SELECT_FILES_DEVICE_BTN)));
+        System.out.println("Found!");
+        secBtn.click();
+        Thread.sleep(2000); // Clunky, but no other options since we cant use selectors on Windows Explorer Dialog
+        System.out.println("Attempting to type file path of desired file...");
+        type(path);
+        System.out.println("Done!");
+    }
+
+
+
+    @Then("^the file is uploaded to Google Drive with name \"([^\"]*)\" and with a shareable link$")
+    public void fileUploadedToGoogleDrive(String fileName){
         System.out.println("Waiting for file attachment message to disappear...");
         String LARGE_FILE_NOTIFICATION = "//span[contains(text(),'Attaching File')]";
         driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(LARGE_FILE_NOTIFICATION)));
         driverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(LARGE_FILE_NOTIFICATION)));
         System.out.println("Done!");
-
-    }
-
-    @Then("^the Google Drive Link appears in email with name \"([^\"]*)\"$")
-    public void googleDriveLinkAppears(String fileName){
         System.out.println("Checking for Drive link in email...");
         String driveLink = "//span[contains(text(),'" + fileName + "')]";
         driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(driveLink)));
         System.out.println("Found!");
     }
 
-    @And("^I click the Select Files From Your Device button and a file path as \"([^\"]*)\"$")
-    public void iClickSelectFilesFromYourDevice(String filePath) throws Throwable {
-        System.out.println("Attempting to find Select Files From Your Device button...");
-        String SELECT_FILES_DEVICE_BTN = "//div[contains(text(),'Select files from your device')]";
-        WebElement btn = driverWait
-                .until(ExpectedConditions.elementToBeClickable(By.xpath(SELECT_FILES_DEVICE_BTN)));
-        System.out.println("Found!");
-        btn.click();
-        Thread.sleep(2000); // Clunky, but no other options since we cant use selectors on Windows Explorer Dialog
-        System.out.println("Attempting to type file path of desired file...");
-        type(filePath);
-        System.out.println("Done!");
-    }
-
-
-    /**
-     * SENDING EMAIL / CHECKING FOR ERRORS
-     */
-
-    @Then("^completed the upload of file named \"([^\"]*)\"$")
+    @Then("^the file named \"([^\"]*)\" is uploaded$")
     public void fileUploadCompleted(String ariaLabel){
         System.out.println("Waiting on file upload to complete...");
         String xPathArg = "//div[contains(@aria-label, '" + ariaLabel + "')]";
@@ -215,12 +212,13 @@ public class StepDefinitions {
         System.out.println("File upload complete!");
     }
 
-    // The notification iframe for granting access permissions to Google Drive Link dynamically appears 
-    // and is never in the same place or with the same id
-    // Hence why it is necessary to loop through the iframes to find it 
-    @Then("a notification appears checking access permissions")
-    public void accessPermissionsCheck(){
 
+    // The notification iframe for granting access permissions to Google Drive Link dynamically appears
+    // and is never in the same place or with the same id
+    // Hence why it is necessary to loop through the iframes to find it
+    // NOTE: This assumption was made based on other elements of the GMail page being dynamically named
+    @And("^I approve access permissions for the file")
+    public void iApproveAccessPermissions(){
         List<WebElement> iframe_element = driver.findElements(By.tagName("iframe"));
         WebDriverWait accessDriverWait = new WebDriverWait(driver, 2);
         int i = 0;
@@ -245,7 +243,11 @@ public class StepDefinitions {
         driver.switchTo().parentFrame();
     }
 
-    @And("^I click the Send button")
+
+    /**
+     * SENDING EMAIL / CHECKING FOR ERRORS
+     */
+    @When("^I send the email")
     public void iClickSend() throws Throwable{
         while(!waitRobot); 
         System.out.println("Attempting to find Send button...");
@@ -260,27 +262,18 @@ public class StepDefinitions {
      * CHECKING FOR SENT EMAIL OR ERROR
      */
 
-    @Then("^the message sent notification appears")
-    public void messageSentAppears() throws Throwable {
+    @Then("^the message with subject \"([^\"]*)\" with the image is sent$")
+    public void messageWithSubjectAndImageIsSent(String subject){
         String messageSent = "//span[contains(text(), 'Message sent.')]";
         driverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(messageSent)));
         System.out.println("Message sent notification appeared.");
-    }
-
-
-    @And("^I click the Sent folder button")
-    public void iClickSentFolderButton(){
         System.out.println("Attempting to find Sent Folder button...");
         String SENT_FOLDER_BTN = "//a[contains(@aria-label,'Sent')]";
         WebElement btn = driverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(SENT_FOLDER_BTN)));
         System.out.println("Found!");
         btn.click();
-    }
-
-    @Then("^my email should be displayed in the sent folder with subject \"([^\"]*)\"$")
-    public void emailShouldBeDisplayed(String subjectString) throws Throwable {
         System.out.println("Attempting to find sent email in list of sent emails...");
-        String SENT_EMAIL = "//span[contains(text(),'" + subjectString + "')]";
+        String SENT_EMAIL = "//span[contains(text(),'" + subject + "')]";
         driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(SENT_EMAIL)));
         System.out.println("Email was found in sent folder!");
         driver.quit();

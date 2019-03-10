@@ -10,15 +10,9 @@ Feature: Send an email with an attached images
     When I compose an email
     And I specify a valid email address as "<email>" with subject "<subject>"
     And I attach a valid image file as "<path>"
-    # And I click on the Attach File button
-    # And I select the desired image as "<path>"
     Then the file named "<arialabel>" is uploaded
     When I send the email
-    # And I click the Send button
     Then the message with subject "<subject>" with the image is sent
-    # Then the message sent notification appears
-    # And I click the Sent folder button
-    # Then my email should be displayed in the sent folder with subject "<subject>"
     Examples:
       | email   | path | arialabel | subject |
       | dreamteamlite@gmail.com | C:\Users\Evan\Downloads\Spicy.PNG | Attachment: Spicy.PNG. Press enter to view the attachment and delete to remove it | Spicy_Valid |
@@ -31,20 +25,11 @@ Feature: Send an email with an attached images
   Scenario Outline: I try to send an email to a valid email address with an attached image greater than 25 MB
     When I compose an email
     And I specify a valid email address as "<email>" with subject "<subject>"
-    And I attach a valid image file of size greater than 25MB as "<path>"    
-    # And I click on the Attach File button
-    # And I select the desired large image as "<path>"
-    Then the file is uploaded to Google Drive with name "<filename>" and with a shareable link 
-    # Then a notification appears saying the large file is being sent as a Google Drive Link
-    # Then the Google Drive Link appears in email with name "<filename>"
+    And I attach a valid image file of size greater than 25MB as "<path>"
+    Then the file is uploaded to Google Drive with name "<filename>" and with a shareable link
     When I send the email
-    # And I click the Send button
-    # Then a notification appears checking access permissions
     And I approve access permissions for the file
     Then the message with subject "<subject>" with the image is sent
-    # Then the message sent notification appears
-    # And I click the Sent folder button
-    # Then my email should be displayed in the sent folder with subject "<subject>"
     Examples:
       | email  | path | filename | subject |
       | ebbruchet@gmail.com | C:\Users\Evan\Downloads\Earth.jpg | Earth.jpg | Earth |
@@ -57,15 +42,8 @@ Feature: Send an email with an attached images
     When I compose an email
     And I specify a valid email address as "<email>" with subject "<subject>"
     And I attach a valid image file as "<path>" by inserting a photo
-    # And I click on the Insert Photo button
-    # And I click the As Attachment button
-    # And I click the Select Files From Your Device button and a file path as "<path>"
-    # And I click the Send button
     When I send the email
-    # And I click the Sent folder button
     Then the message with subject "<subject>" with the image is sent
-    # Then the message sent notification appears
-    # Then my email should be displayed in the sent folder with subject "<subject>"
     Examples:
       | email   | path | subject |
       | dreamteamlite@gmail.com | C:\Users\Evan\Downloads\Spicy.PNG | Spicy_DiffButton |
@@ -79,11 +57,7 @@ Feature: Send an email with an attached images
     When I compose an email
     And I specify an invalid email address as "<email>"
     And I attach a valid image file as "<path>"
-    # And I click on the Attach File button
-    # And I select the desired image as "<path>"
-    # Then completed the upload of file named "<filename>"
     When I send the email
-    # And I click the Send button
     Then I should see an error message
     Examples:
       | email   | path | filename |
